@@ -43,6 +43,16 @@ function formatDate(date?: string) {
   );
 }
 
+function getDeviceTitle(device: Device) {
+  if (device.deviceType !== "ALPR / License Plate Reader") return device.name;
+  return device.manufacturer ? `${device.manufacturer} ALPR Camera` : "ALPR Camera";
+}
+
+function getDeviceLabel(device: Device) {
+  const title = getDeviceTitle(device);
+  return device.model ? `${title}, model ${device.model}` : title;
+}
+
 function InfoRow({ label, value }: { label: string; value?: string }) {
   return (
     <div className="border-b border-line/70 py-2.5 last:border-0">
@@ -65,8 +75,9 @@ function DeviceDetails({ device, onClose }: { device: Device; onClose: () => voi
             <span className="rounded-sm bg-[#f3e1d9] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#a54428]">Demo record</span>
             <span className="text-[11px] font-medium text-muted">{device.id}</span>
           </div>
-          <h2 className="text-xl font-semibold tracking-[-0.02em] text-ink">{device.name}</h2>
+          <h2 className="text-xl font-semibold tracking-[-0.02em] text-ink">{getDeviceTitle(device)}</h2>
           <p className="mt-1 text-sm text-muted">{device.deviceType}</p>
+          {device.deviceType === "ALPR / License Plate Reader" && <p className="mt-2 text-xs text-muted">Manufacturer: {device.manufacturer || NOT_DOCUMENTED} · Model: {device.model || NOT_DOCUMENTED}</p>}
         </div>
         <button aria-label="Close device details" className="rounded-md p-2 text-muted hover:bg-paper hover:text-ink" onClick={onClose}><X size={18} /></button>
       </div>
@@ -144,7 +155,7 @@ export default function MapShell() {
     markers.current = visibleDevices.map((device) => {
       const markerElement = document.createElement("button");
       markerElement.type = "button";
-      markerElement.ariaLabel = `View ${device.name}`;
+      markerElement.ariaLabel = `View ${getDeviceLabel(device)}`;
       markerElement.className = "map-marker";
       markerElement.style.backgroundColor = categoryColors[device.deviceType];
       if (selectedId === device.id) markerElement.classList.add("selected");
