@@ -1,0 +1,23 @@
+{
+  "source": {
+    "service": "NCDOT ITS Devices",
+    "layer": 0,
+    "layerUrl": "https://gis11.services.ncdot.gov/arcgis/rest/services/NCDOT_ITSDevices/NCDOT_ITSDevices/MapServer/0",
+    "queryUrl": "https://gis11.services.ncdot.gov/arcgis/rest/services/NCDOT_ITSDevices/NCDOT_ITSDevices/MapServer/0/query",
+    "boundaryServiceUrl": "https://gis11.services.ncdot.gov/arcgis/rest/services/NCDOT_CountyBdy_Poly/MapServer/0"
+  },
+  "selection": {
+    "cctvNamePredicate": "Name LIKE '%CCTV%'",
+    "acceptedDeviceType": null,
+    "countyMethod": "Point-in-polygon against the official NCDOT County Boundary polygon for UpperCountyName = PITT, queried and returned in EPSG:4326.",
+    "coordinateFields": {
+      "latitude": "Lat",
+      "longitude": "Long"
+    }
+  },
+  "counts": {
+    "statewideCctvNamedRecords": 1402,
+    "pittCountyCctvRecords": 0
+  },
+  "records": []
+}
