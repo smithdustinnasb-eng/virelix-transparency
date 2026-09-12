@@ -8,7 +8,7 @@ This is an independent project by Virelix Technologies LLC. It does not imply af
 
 The map is designed to present sourced public records about ALPR/license plate readers, traffic cameras, automated enforcement, and other public cameras. Every factual record should be traceable to one or more legitimate public sources. Uncertainty and location precision are shown explicitly.
 
-The current build contains three clearly marked fictional demo records for interface development. It does not contain real camera coordinates or researched Pitt County records.
+The current build contains one community-reported physical device and three documented deployment records for Pitt County. Map coverage is incomplete, and absence of a marker does not indicate absence of a device.
 
 ## Run locally
 

@@ -1,10 +1,15 @@
 {
-  "status": "DEMO DATA",
+  "status": "PUBLIC DATA",
   "events": [
     {
-      "date": "2026-09-11",
-      "title": "Interface fixtures created",
-      "description": "Three fictional devices were added to exercise the map interface."
+      "date": "2025-06-02",
+      "title": "Pitt County Sheriff's Office deployment approved",
+      "description": "The Pitt County Board of Commissioners agenda documents approval of the Flock Safety ALPR purchase."
+    },
+    {
+      "date": "2026-08-28",
+      "title": "Greenville Police Department deployment cancelled",
+      "description": "WITN reported that Greenville Police dropped plans to install new Flock cameras."
     }
   ]
 }

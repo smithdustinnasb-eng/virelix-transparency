@@ -15,12 +15,12 @@ import * as maplibregl from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   categoryColors,
-  demoDevices,
+  devices,
   deviceTypes,
   type Device,
   type DeviceType,
 } from "../data/devices";
-import { demoDeployments } from "../data/deployments";
+import { deployments } from "../data/deployments";
 
 const NOT_DOCUMENTED = "Not publicly documented";
 
@@ -54,6 +54,12 @@ function getDeviceLabel(device: Device) {
   return device.model ? `${title}, model ${device.model}` : title;
 }
 
+function getVerificationBadgeClass(status: Device["verificationStatus"]) {
+  if (status === "Community reported") return "border-[#d6bd78] bg-[#fff9e8] text-[#765d19]";
+  if (status === "Confirmed" || status === "Public-record confirmed") return "border-[#9bc4af] bg-[#eef9f2] text-[#276341]";
+  return "border-line bg-paper text-muted";
+}
+
 function InfoRow({ label, value }: { label: string; value?: string }) {
   return (
     <div className="border-b border-line/70 py-2.5 last:border-0">
@@ -73,7 +79,7 @@ function DeviceDetails({ device, onClose }: { device: Device; onClose: () => voi
       <div className="flex items-start justify-between border-b border-line px-5 py-5">
         <div className="pr-4">
           <div className="mb-2 flex items-center gap-2">
-            <span className="rounded-sm bg-[#f3e1d9] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#a54428]">Demo record</span>
+            <span className="rounded-sm bg-[#eef2f0] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#3d5a51]">Public record</span>
             <span className="text-[11px] font-medium text-muted">{device.id}</span>
           </div>
           <h2 className="text-xl font-semibold tracking-[-0.02em] text-ink">{getDeviceTitle(device)}</h2>
@@ -84,7 +90,7 @@ function DeviceDetails({ device, onClose }: { device: Device; onClose: () => voi
       </div>
       <div className="flex-1 overflow-y-auto px-5 py-5">
         <div className="mb-6 flex flex-wrap gap-2">
-          <span className="rounded-full border border-[#d8a28e] bg-[#fff6f1] px-3 py-1 text-xs font-semibold text-[#a54428]">{device.verificationStatus}</span>
+          <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${getVerificationBadgeClass(device.verificationStatus)}`}>{device.verificationStatus}</span>
           <span className="rounded-full border border-line bg-paper px-3 py-1 text-xs text-muted">{device.locationPrecision}</span>
         </div>
 
@@ -109,7 +115,7 @@ function DeviceDetails({ device, onClose }: { device: Device; onClose: () => voi
           <InfoRow label="Published lane coverage" value={device.publishedLaneCoverage} />
           <InfoRow label="Camera direction / orientation" value={device.direction} />
           <InfoRow label="Coverage confidence" value={device.coverageConfidence} />
-        </dl><div className="mt-3 border-l-2 border-[#d56339] bg-[#fff6f1] px-3 py-2.5 text-xs leading-5 text-[#70402f]">Coverage visualization represents published specifications and available public information. It is not a measurement of the actual installation.</div></section>
+        </dl><div className="mt-3 border-l-2 border-[#d56339] bg-[#fff6f1] px-3 py-2.5 text-xs leading-5 text-[#70402f]">{device.publishedRange || device.publishedFieldWidth || device.publishedLaneCoverage ? "Coverage visualization represents published specifications and available public information. It is not a measurement of the actual installation." : "No coverage visualization is shown because direction alone is not sufficient to establish a field of view."}</div></section>
 
         <section className="mb-7"><SectionHeading>Public cost</SectionHeading><p className="text-sm leading-6 text-ink">{device.documentedCost || NOT_DOCUMENTED}</p></section>
         <section className="mb-7"><SectionHeading>Data &amp; policy</SectionHeading><dl><InfoRow label="Retention period" value={device.retentionPolicy} /><InfoRow label="Data-sharing policy" /></dl></section>
@@ -131,9 +137,10 @@ export default function MapShell() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [enabledTypes, setEnabledTypes] = useState<Record<DeviceType, boolean>>(() => Object.fromEntries(deviceTypes.map((type) => [type, true])) as Record<DeviceType, boolean>);
-  const selectedDevice = demoDevices.find((device) => device.id === selectedId) || null;
-  const visibleDevices = useMemo(() => demoDevices.filter((device) => enabledTypes[device.deviceType]), [enabledTypes]);
-  const confirmedMappedDevices = demoDevices.filter((device) => device.verificationStatus === "Confirmed" || device.verificationStatus === "Public-record confirmed").length;
+  const selectedDevice = devices.find((device) => device.id === selectedId) || null;
+  const visibleDevices = useMemo(() => devices.filter((device) => enabledTypes[device.deviceType]), [enabledTypes]);
+  const confirmedMappedDevices = devices.filter((device) => device.verificationStatus === "Confirmed" || device.verificationStatus === "Public-record confirmed").length;
+  const documentedSpending = deployments.find((deployment) => deployment.documentedCost)?.documentedCost || NOT_DOCUMENTED;
 
   useEffect(() => {
     if (!mapElement.current) return;
@@ -176,7 +183,7 @@ export default function MapShell() {
     if (mapInstance.getLayer("coverage-fill")) mapInstance.removeLayer("coverage-fill");
     if (mapInstance.getLayer("coverage-line")) mapInstance.removeLayer("coverage-line");
     if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId);
-    if (!selectedDevice) return;
+    if (!selectedDevice || (!selectedDevice.publishedRange && !selectedDevice.publishedFieldWidth && !selectedDevice.publishedLaneCoverage)) return;
     const points = Array.from({ length: 25 }, (_, index) => {
       const angle = -75 + (150 * index) / 24;
       const distance = 0.008;
@@ -207,11 +214,11 @@ export default function MapShell() {
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-[#1d26291b] to-transparent" />
         <div className="absolute left-4 top-4 z-10 flex max-w-[calc(100%-32px)] flex-col gap-2 md:left-7 md:top-6"><div className="flex items-center gap-2"><button className="pointer-events-auto flex items-center gap-2 rounded-md border border-line bg-panel px-3 py-2 text-xs font-bold shadow-sm hover:border-[#d56339]" onClick={() => setFiltersOpen(!filtersOpen)}><Layers3 size={15} /> Filters <span className="rounded-full bg-[#243d3d] px-1.5 py-0.5 text-[10px] text-white">{visibleDevices.length}</span><ChevronDown size={14} className={filtersOpen ? "rotate-180 transition-transform" : "transition-transform"} /></button><button className="pointer-events-auto hidden rounded-md border border-line bg-panel p-2 text-muted shadow-sm hover:text-ink sm:block" aria-label="Map help"><CircleHelp size={16} /></button></div>{filtersOpen && <div className="pointer-events-auto w-72 border border-line bg-panel p-4 shadow-lg"><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Device categories</p>{deviceTypes.map((type) => <label className="mb-3 flex cursor-pointer items-center gap-3 last:mb-0" key={type}><input checked={enabledTypes[type]} onChange={() => toggleType(type)} type="checkbox" className="h-4 w-4 accent-[#d56339]" /><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColors[type] }} /><span className="text-xs text-ink">{type}</span></label>)}</div>}</div>
         <div className="absolute bottom-5 left-4 z-10 hidden w-[245px] border border-line bg-panel/95 p-4 shadow-sm backdrop-blur-sm md:left-7 md:block"><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Map legend</p>{deviceTypes.map((type) => <div className="mb-2 flex items-center gap-2.5 last:mb-0" key={type}><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColors[type] }} /><span className="text-xs text-ink">{type}</span></div>)}</div>
-        <div className="absolute bottom-5 right-4 z-10 w-[220px] border border-line bg-panel/95 p-4 shadow-sm backdrop-blur-sm md:right-7"><div className="mb-2 flex items-center justify-between"><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Pitt County</p><span className="rounded-sm bg-[#f3e1d9] px-1.5 py-1 text-[9px] font-bold tracking-[0.1em] text-[#a54428]">DEMO DATA</span></div><p className="text-2xl font-semibold tracking-[-0.04em] text-ink">{demoDevices.length}</p><p className="text-xs text-muted">fictional demo fixtures</p><div className="mt-3 grid grid-cols-2 gap-y-2 border-t border-line pt-3 text-[11px]"><span className="text-muted">Deployments</span><span className="text-right font-semibold">{demoDeployments.length} demo</span><span className="text-muted">Physical devices</span><span className="text-right font-semibold">{demoDevices.length} mapped / {confirmedMappedDevices} confirmed</span><span className="text-muted">Planned</span><span className="text-right font-semibold">{demoDeployments.filter((deployment) => deployment.deploymentStatus === "Planned").length} demo</span><span className="text-muted">Cancelled</span><span className="text-right font-semibold">{demoDeployments.filter((deployment) => deployment.deploymentStatus === "Cancelled").length} demo</span></div></div>
-        <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 border border-[#d8a28e] bg-[#fff6f1] px-3 py-2 text-center text-[10px] font-semibold tracking-[0.02em] text-[#8c422d] shadow-sm md:top-6">DEVELOPMENT PREVIEW · ALL RECORDS ARE FICTIONAL</div>
+        <div className="absolute bottom-5 right-4 z-10 w-[220px] border border-line bg-panel/95 p-4 shadow-sm backdrop-blur-sm md:right-7"><div className="mb-2 flex items-center justify-between"><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Pitt County</p><span className="rounded-sm bg-[#eef2f0] px-1.5 py-1 text-[9px] font-bold tracking-[0.1em] text-[#3d5a51]">PUBLIC DATA</span></div><p className="text-2xl font-semibold tracking-[-0.04em] text-ink">{devices.length}</p><p className="text-xs text-muted">mapped physical device</p><div className="mt-3 grid grid-cols-2 gap-y-2 border-t border-line pt-3 text-[11px]"><span className="text-muted">Deployments</span><span className="text-right font-semibold">{deployments.length}</span><span className="text-muted">Physical devices</span><span className="text-right font-semibold">{devices.length} mapped / {confirmedMappedDevices} confirmed</span><span className="text-muted">Planned</span><span className="text-right font-semibold">{deployments.filter((deployment) => deployment.deploymentStatus === "Planned").length}</span><span className="text-muted">Cancelled</span><span className="text-right font-semibold">{deployments.filter((deployment) => deployment.deploymentStatus === "Cancelled").length}</span><span className="text-muted">Public spending</span><span className="text-right font-semibold">{documentedSpending}</span></div><p className="mt-3 border-t border-line pt-3 text-[10px] leading-4 text-muted">Map coverage is incomplete. Absence of a marker does not indicate absence of a device.</p></div>
+        <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 border border-[#b7c9c1] bg-[#f1f7f4] px-3 py-2 text-center text-[10px] font-semibold tracking-[0.02em] text-[#36584c] shadow-sm md:top-6">PUBLIC DATA · SOURCE VERIFICATION VARIES BY RECORD</div>
         {selectedDevice && <DeviceDetails device={selectedDevice} onClose={() => setSelectedId(null)} />}
       </div>
-      <footer className="z-30 flex h-8 shrink-0 items-center justify-between border-t border-line bg-panel px-4 text-[10px] text-muted md:px-7"><span>An open-source public data project by Virelix Technologies LLC.</span><span className="hidden sm:inline">Pitt County, North Carolina · Demo fixtures only</span></footer>
+      <footer className="z-30 flex h-8 shrink-0 items-center justify-between border-t border-line bg-panel px-4 text-[10px] text-muted md:px-7"><span>An open-source public data project by Virelix Technologies LLC.</span><span className="hidden sm:inline">Pitt County, North Carolina · Public records and community reports</span></footer>
     </main>
   );
 }

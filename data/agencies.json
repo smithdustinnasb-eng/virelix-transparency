@@ -1,17 +1,17 @@
 [
   {
-    "name": "Demo public safety agency",
-    "county": "Pitt County",
-    "status": "Fictional development fixture"
+    "name": "Pitt County Sheriff's Office",
+    "county": "Pitt",
+    "status": "Public deployment record"
   },
   {
-    "name": "Demo public works agency",
-    "county": "Pitt County",
-    "status": "Fictional development fixture"
+    "name": "Winterville Police Department",
+    "county": "Pitt",
+    "status": "Public deployment record"
   },
   {
-    "name": "Demo civic services agency",
-    "county": "Pitt County",
-    "status": "Fictional development fixture"
+    "name": "Greenville Police Department",
+    "county": "Pitt",
+    "status": "Public deployment record"
   }
 ]
