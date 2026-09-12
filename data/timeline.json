@@ -1,0 +1,10 @@
+{
+  "status": "DEMO DATA",
+  "events": [
+    {
+      "date": "2026-09-11",
+      "title": "Interface fixtures created",
+      "description": "Three fictional devices were added to exercise the map interface."
+    }
+  ]
+}

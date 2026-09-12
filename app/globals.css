@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #1d2629;
+  --muted: #667274;
+  --paper: #f3f0ea;
+  --panel: #fbfaf7;
+  --line: #d9d8d1;
+  --accent: #d56339;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-paper: var(--paper);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+button, a { -webkit-tap-highlight-color: transparent; }
+.maplibregl-ctrl-attrib { font-size: 9px; }
+.maplibregl-canvas { outline: none; }
+.map-marker { width: 23px; height: 23px; border: 2px solid #fff; border-radius: 50% 50% 50% 0; box-shadow: 0 2px 8px #1d262955; transform: rotate(-45deg); cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
+.map-marker::after { content: ""; display: block; width: 7px; height: 7px; margin: 6px; background: #fff; border-radius: 50%; }
+.map-marker:hover, .map-marker.selected { transform: rotate(-45deg) scale(1.18); box-shadow: 0 3px 12px #1d262977; }
+@media (max-width: 700px) { .maplibregl-ctrl-attrib { display: none; } }

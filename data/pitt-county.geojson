@@ -1,0 +1,9 @@
+{
+  "type": "FeatureCollection",
+  "name": "Pitt County geographic context",
+  "metadata": {
+    "status": "Placeholder only",
+    "note": "No real camera locations or county boundary claims are included in the first UI build."
+  },
+  "features": []
+}
