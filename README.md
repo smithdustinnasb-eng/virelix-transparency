@@ -24,7 +24,7 @@ Open http://localhost:3000. Other useful checks are `npm run lint`, `npm run typ
 ## Project layout
 
 - `app/` contains the Next.js application shell and MapLibre interface.
-- `data/` contains the reusable TypeScript model and static data files.
+- `data/` contains the reusable TypeScript models and static device, deployment, agency, and timeline data files.
 - `METHODOLOGY.md` describes verification and sourcing standards.
 - `DATA_POLICY.md` describes information the project will not publish.
 - `CONTRIBUTING.md` describes how to submit corrections and sourced records.

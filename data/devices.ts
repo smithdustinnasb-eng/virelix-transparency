@@ -15,6 +15,13 @@ export type LocationPrecision =
   | "Exact publicly documented"
   | "Approximate"
   | "Deployment confirmed / exact location unknown";
+export type DeploymentStatus =
+  | "Active"
+  | "Planned"
+  | "Cancelled"
+  | "Removed"
+  | "Status unknown";
+export type OperatorConfidence = "Confirmed" | "Probable" | "Unknown";
 
 export interface DeviceSource {
   title: string;
@@ -50,6 +57,9 @@ export interface Device {
   lastVerified?: string;
   verificationStatus: VerificationStatus;
   locationPrecision: LocationPrecision;
+  deploymentId?: string;
+  deploymentStatus: DeploymentStatus;
+  operatorConfidence: OperatorConfidence;
   description?: string;
   publishedRange?: string;
   publishedFieldWidth?: string;
@@ -88,6 +98,8 @@ export const demoDevices: Device[] = [
     lastVerified: "2026-09-11",
     verificationStatus: "Unverified",
     locationPrecision: "Approximate",
+    deploymentStatus: "Status unknown",
+    operatorConfidence: "Unknown",
     description:
       "A fictional record used to exercise the interface. No real device or installation is represented.",
     publishedRange: "Not publicly documented",
@@ -124,6 +136,8 @@ export const demoDevices: Device[] = [
     lastVerified: "2026-09-11",
     verificationStatus: "Unverified",
     locationPrecision: "Approximate",
+    deploymentStatus: "Status unknown",
+    operatorConfidence: "Unknown",
     description:
       "A fictional traffic camera record included only to demonstrate selection and evidence states.",
     publishedRange: "Not publicly documented",
@@ -160,6 +174,8 @@ export const demoDevices: Device[] = [
     lastVerified: "2026-09-11",
     verificationStatus: "Unverified",
     locationPrecision: "Deployment confirmed / exact location unknown",
+    deploymentStatus: "Status unknown",
+    operatorConfidence: "Unknown",
     description:
       "A fictional record showing how a less precise location is presented without inventing detail.",
     coverageConfidence: "Informational demo only",
